@@ -36,7 +36,8 @@ function loadConfiguration()
 		
 		FROM_PATH=
 		COMBINED_PATH=
-		FROM_THRESHOLD_SPACE=20971520 # In MegaByte
+		FROM_START_THRESHOLD_SPACE=15728640 # In MegaByte
+		FROM_STOP_THRESHOLD_SPACE=20971520 # In MegaByte
 		MIN_FOLDER_SIZE_TO_DISPATCH=51200  # In MegaByte
 		
 		TO_PATH=
@@ -99,8 +100,13 @@ fi
 
 # Numbers validation
 isInteger='^[0-9]+$'
-if ! [[ "$FROM_THRESHOLD_SPACE" =~ $isInteger ]]; then
-	addLog "E" "Configuration \"FROM_THRESHOLD_SPACE\" \"$FROM_THRESHOLD_SPACE\" is not a valid number"
+if ! [[ "$FROM_STOP_THRESHOLD_SPACE" =~ $isInteger ]]; then
+	addLog "E" "Configuration \"FROM_STOP_THRESHOLD_SPACE\" \"$FROM_STOP_THRESHOLD_SPACE\" is not a valid number"
+	shallContinue=N
+fi
+
+if ! [[ "$FROM_START_THRESHOLD_SPACE" =~ $isInteger ]]; then
+	addLog "E" "Configuration \"FROM_START_THRESHOLD_SPACE\" \"$FROM_START_THRESHOLD_SPACE\" is not a valid number"
 	shallContinue=N
 fi
 
@@ -151,8 +157,8 @@ if [ $toFreeSpace -le $TO_THRESHOLD_SPACE ]; then
 	exit
 fi
 
-if [ $fromFreeSpace -ge $FROM_THRESHOLD_SPACE ]; then
-	addLog "N" "FROM_PATH, \"$FROM_PATH\", has over than $FROM_THRESHOLD_SPACE MB of freespace... quitting"
+if [ $fromFreeSpace -ge $FROM_START_THRESHOLD_SPACE ]; then
+	addLog "N" "FROM_PATH, \"$FROM_PATH\", has over than $FROM_START_THRESHOLD_SPACE MB of freespace... quitting"
 	exit
 fi
 
@@ -264,10 +270,7 @@ for index in ${!folders[@]}; do
 	fromFreeSpace=$(getDiskFreeSpace "$FROM_PATH" "m")
 	toFreeSpace=$(getDiskFreeSpace "$TO_PATH" "m")
 	
-	toFreeSpace=$afterCopyingToFreeSpace
-	fromFreeSpace=$afterCopyingFromFreeSpace
-	
-	if [ $fromFreeSpace -ge $FROM_THRESHOLD_SPACE ]; then
+	if [ $fromFreeSpace -ge $FROM_STOP_THRESHOLD_SPACE ]; then
 		echo "Ending dispatch because there is enough free space"
 		exit
 	fi
