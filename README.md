@@ -1,1 +1,1 @@
-# com.cyberinternauts.linux.space-dispacther
+# com.cyberinternauts.linux.space-dispatcher
