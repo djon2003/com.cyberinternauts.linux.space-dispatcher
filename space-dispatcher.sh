@@ -260,6 +260,9 @@ for index in ${!folders[@]}; do
 		rm -rf "$toTmpFolderPath/" # Remove partially copied folder
 	fi
 	
+	# Gather from system instead of calculation due to possible external data change
+	fromFreeSpace=$(getDiskFreeSpace "$FROM_PATH" "m")
+	toFreeSpace=$(getDiskFreeSpace "$TO_PATH" "m")
 	
 	toFreeSpace=$afterCopyingToFreeSpace
 	fromFreeSpace=$afterCopyingFromFreeSpace
